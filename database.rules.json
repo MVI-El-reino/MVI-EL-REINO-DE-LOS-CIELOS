@@ -1,0 +1,17 @@
+{
+  "rules": {
+    "peticiones": {
+      ".read": "auth.token.admin === true",
+      "$id": {
+        ".write": "auth.token.admin === true",
+        "estado": { ".validate": "newData.val() == 'contestada' || newData.val() == 'no contestada'" }
+      }
+    },
+    "codigos": {
+      "$codigo": {
+        ".read": true,
+        ".write": "auth.token.admin === true"
+      }
+    }
+  }
+}
