@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Banco de peticiones, MVI El Reino de los Cielos</title>
+<meta name="description" content="Envíe su petición de oración y reciba un versículo. MVI El Reino de los Cielos, Córdoba, Veracruz.">
+<meta property="og:title" content="Banco de peticiones, MVI El Reino de los Cielos">
+<meta property="og:description" content="Envíe su petición de oración y reciba un versículo.">
+<meta property="og:image" content="/icons/icon-512.png">
+<meta name="theme-color" content="#121212">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header>
+  <img src="/icons/icon-192.png" alt="Escudo de MVI El Reino de los Cielos">
+  <div><h1>Banco de peticiones</h1><p>MVI El Reino de los Cielos<br>Córdoba, Veracruz</p></div>
+</header>
+<main>
+
+<section id="inicio" class="pantalla activa">
+  <p>Aquí puede dejar su petición de oración. Recibirá un versículo para su situación y, si lo desea, el pastor le puede ayudar personalmente.</p>
+  <nav>
+    <button class="fila" data-ir="pedir" type="button">Pedir oración</button>
+    <button class="fila" data-ir="mis" type="button">Mis peticiones</button>
+    <button class="fila" data-ir="conocer" type="button">Conocer más</button>
+  </nav>
+</section>
+
+<section id="pedir" class="pantalla">
+  <h2>Escriba su petición</h2>
+  <form id="formulario">
+    <label for="texto">Cuéntenos lo que necesita. Puede dictarlo con el micrófono del teclado.</label>
+    <textarea id="texto" maxlength="800" required></textarea>
+
+    <p class="etiqueta">Tema (opcional)</p>
+    <div class="temas" id="temas">
+      <button type="button" data-tema="salud" aria-pressed="false">Salud</button>
+      <button type="button" data-tema="miedo" aria-pressed="false">Miedo o preocupación</button>
+      <button type="button" data-tema="duelo" aria-pressed="false">Duelo</button>
+      <button type="button" data-tema="familia" aria-pressed="false">Familia</button>
+      <button type="button" data-tema="trabajo" aria-pressed="false">Trabajo o dinero</button>
+      <button type="button" data-tema="decisiones" aria-pressed="false">Decisiones</button>
+      <button type="button" data-tema="gratitud" aria-pressed="false">Dar gracias</button>
+    </div>
+
+    <p class="etiqueta">¿Quiere poner su nombre?</p>
+    <label class="opcion"><input type="radio" name="anonimo" value="no" checked> Sí, con mi nombre</label>
+    <label class="opcion"><input type="radio" name="anonimo" value="si"> No, prefiero ser anónimo</label>
+    <div id="bloqueNombre">
+      <label for="nombre">Su nombre</label>
+      <input id="nombre" type="text" maxlength="60" autocomplete="name">
+    </div>
+
+    <label for="telefono">Su celular, si quiere que el pastor le llame (opcional)</label>
+    <input id="telefono" type="tel" inputmode="tel" maxlength="15" autocomplete="tel">
+
+    <div class="oculto" aria-hidden="true"><label>No llene este campo <input id="web" tabindex="-1" autocomplete="off"></label></div>
+
+    <label class="opcion"><input type="checkbox" id="acepto"> Acepto que solo el pastor y el equipo de oración lean mi petición. Leí el <a href="#" data-ir="aviso">aviso de privacidad</a>.</label>
+
+    <p id="error" class="error" role="alert"></p>
+    <button class="principal" id="enviar" type="submit">Enviar petición</button>
+  </form>
+</section>
+
+<section id="resultado" class="pantalla">
+  <h2>Su petición fue recibida</h2>
+  <p>Guarde este código para revisar su petición después:</p>
+  <p class="codigo" id="codigoTxt"></p>
+  <button class="secundario" id="copiar" type="button">Copiar código</button>
+  <div class="verso">
+    <p class="cita" id="citaTxt"></p>
+    <p id="versoTxt"></p>
+    <button class="secundario" id="escuchar" type="button">Escuchar el versículo</button>
+  </div>
+  <button id="compartir" type="button">Compartir por WhatsApp</button>
+  <button class="secundario" data-ir="inicio" type="button">Volver al inicio</button>
+</section>
+
+<section id="mis" class="pantalla">
+  <h2>Mis peticiones</h2>
+  <p>Aquí aparecen los códigos de las peticiones que envió desde este celular.</p>
+  <ul class="mis" id="listaMis"></ul>
+  <p id="sinMis">Todavía no tiene peticiones guardadas en este celular.</p>
+</section>
+
+<section id="conocer" class="pantalla">
+  <h2>Conocer más</h2>
+  <h3>Nuestra historia</h3>
+  <ol class="linea">
+    <li><strong>[Año]</strong><br>[Primer momento de la iglesia.]</li>
+    <li><strong>[Año]</strong><br>[Otro momento importante.]</li>
+    <li><strong>[Año]</strong><br>[Momento actual.]</li>
+  </ol>
+  <h3>Dónde nos reunimos</h3>
+  <p>[Dirección completa]</p>
+  <p>[Días y horarios de los servicios]</p>
+  <h3>Lo que creemos</h3>
+  <p>[Declaración de fe oficial de la iglesia.]</p>
+  <button class="secundario" data-ir="aviso" type="button">Aviso de privacidad</button>
+</section>
+
+<section id="aviso" class="pantalla">
+  <h2>Aviso de privacidad</h2>
+  <p>MVI El Reino de los Cielos, en Córdoba, Veracruz, es responsable de los datos que usted escribe aquí: su petición, su nombre si lo pone y su celular si lo da. Solo el pastor y el equipo de oración los leen, y se usan únicamente para atender su petición. Si quiere que su petición se borre, pídalo con el botón de ayuda.</p>
+  <p>[Texto a revisar con alguien que conozca la LFPDPPP antes de publicar.]</p>
+  <button class="secundario" data-ir="inicio" type="button">Volver al inicio</button>
+</section>
+
+</main>
+
+<nav class="fijo">
+  <a class="boton ayuda principal" id="btnAyuda" href="#">Necesito ayuda</a>
+  <a class="boton llamar" id="btnLlamar" href="#">Llamar a la iglesia</a>
+</nav>
+<script src="/app.js" defer></script>
+</body>
+</html>

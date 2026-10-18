@@ -1,0 +1,48 @@
+:root{--fondo:#121212;--superficie:#1C1C1C;--texto:#F5EFE0;--acento:#D4AF37;--sobre:#121212;--alerta:#F2B8B5}
+@media (prefers-color-scheme:light){:root{--fondo:#FBF7EE;--superficie:#FFFFFF;--texto:#1A1A1A;--alerta:#8B1E1E}}
+*{box-sizing:border-box}
+body{margin:0 auto;max-width:640px;padding:0 18px calc(190px + env(safe-area-inset-bottom,0px));background:var(--fondo);color:var(--texto);font:400 20px/1.55 "Atkinson Hyperlegible",system-ui,sans-serif}
+header{display:flex;gap:14px;align-items:center;padding:20px 0 16px;border-bottom:2px solid var(--acento)}
+header img{width:72px;height:72px;flex:0 0 auto}
+h1,h2,h3{font-family:Cinzel,Georgia,serif;color:var(--acento);line-height:1.25}
+h1{font-size:1.6rem;margin:0}
+h2{font-size:1.7rem;margin:24px 0 10px}
+h3{font-size:1.3rem;margin:16px 0 6px}
+header p{margin:4px 0 0;font-size:1rem}
+.pantalla{display:none}
+.pantalla.activa{display:block}
+button,.boton{display:flex;align-items:center;justify-content:center;width:100%;min-height:64px;margin:12px 0;padding:10px 16px;font:inherit;font-weight:700;text-align:center;text-decoration:none;color:var(--texto);background:transparent;border:2px solid var(--acento);border-radius:10px;cursor:pointer}
+.principal{background:var(--acento);color:var(--sobre)}
+.secundario{min-height:56px;font-weight:400}
+.fila{justify-content:flex-start;text-align:left;font-size:1.3rem;min-height:76px;margin:0;border:0;border-bottom:1px solid var(--acento);border-radius:0}
+button:disabled{opacity:.5}
+:focus-visible{outline:3px solid var(--acento);outline-offset:3px}
+input:not([type=radio]):not([type=checkbox]),select,textarea{width:100%;font:inherit;font-size:20px;padding:12px;margin:6px 0 16px;color:var(--texto);background:var(--superficie);border:2px solid var(--acento);border-radius:10px}
+textarea{min-height:150px}
+label{display:block;margin-top:14px}
+.etiqueta{margin:20px 0 6px;font-weight:700}
+.temas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.temas button{min-height:60px;margin:0;font-size:1.05rem;font-weight:400;border-width:1px}
+.temas button[aria-pressed=true]{background:var(--acento);color:var(--sobre);font-weight:700}
+.opcion{display:flex;gap:12px;align-items:flex-start;margin:10px 0;font-size:1.05rem}
+.opcion input{flex:0 0 auto;width:26px;height:26px;margin:2px 0 0;accent-color:var(--acento)}
+.oculto{position:absolute;left:-9999px}
+.error{min-height:1.6em;margin:8px 0;font-weight:700;color:var(--alerta)}
+.codigo{margin:6px 0 14px;font-size:2.1rem;font-weight:700;letter-spacing:.12em;color:var(--acento)}
+.verso{margin:18px 0;padding:4px 0 4px 16px;border-left:4px solid var(--acento)}
+.cita{margin:0 0 6px;font-weight:700;color:var(--acento)}
+.verso p{margin:0 0 10px}
+.linea{margin:0;padding:0;list-style:none}
+.linea li{padding:0 0 18px 18px;border-left:2px solid var(--acento)}
+.mis{margin:0;padding:0;list-style:none}
+.mis li{padding:14px 0;border-bottom:1px solid var(--acento)}
+.mis p{margin:6px 0}
+.fila-admin{padding:14px 0;border-top:2px solid var(--acento)}
+.fila-admin small{display:block;opacity:.85}
+.estados{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.estados button{min-height:56px;margin:6px 0;font-size:1rem}
+.estados .activo{background:var(--acento);color:var(--sobre)}
+.nota{opacity:.9;font-size:1rem}
+.fijo{position:fixed;left:0;right:0;bottom:0;max-width:640px;margin:0 auto;display:grid;gap:6px;padding:10px 18px calc(10px + env(safe-area-inset-bottom,0px));background:var(--fondo);border-top:2px solid var(--acento)}
+.fijo .ayuda{min-height:72px;margin:0;font-size:1.3rem}
+.fijo .llamar{min-height:52px;margin:0;font-weight:400;border-width:1px}

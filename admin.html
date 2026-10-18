@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Panel de peticiones</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header>
+  <img src="/icons/icon-192.png" alt="Escudo de MVI El Reino de los Cielos">
+  <div><h1>Panel de peticiones</h1><p>Solo para el pastor y quienes administran</p></div>
+</header>
+<main>
+
+<section id="entrar" class="pantalla activa">
+  <h2>Entrar</h2>
+  <label for="clave">Contraseña del panel</label>
+  <input id="clave" type="password" autocomplete="current-password">
+  <p id="errorEntrar" class="error" role="alert"></p>
+  <button class="principal" id="btnEntrar" type="button">Entrar</button>
+</section>
+
+<section id="panel" class="pantalla">
+  <label for="filtro">Mostrar</label>
+  <select id="filtro">
+    <option value="todas">Todas</option>
+    <option value="no contestada">Sin contestar</option>
+    <option value="contestada">Contestadas</option>
+  </select>
+  <p id="cuenta" class="nota"></p>
+  <div id="lista"></div>
+  <button class="secundario" id="btnSalir" type="button">Cerrar sesión</button>
+</section>
+
+</main>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, signInWithCustomToken, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getDatabase, ref, onValue, update } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+// Pegue aquí la configuración web de Firebase (Configuración del proyecto, sección Sus apps).
+const app = initializeApp({
+  apiKey: 'PEGAR_API_KEY',
+  authDomain: 'peticiones-mvi.firebaseapp.com',
+  databaseURL: 'https://peticiones-mvi-default-rtdb.firebaseio.com',
+  projectId: 'peticiones-mvi',
+  appId: 'PEGAR_APP_ID',
+});
+const auth = getAuth(app);
+const db = getDatabase(app);
+let peticiones = [];
+let parar = null;
+const $ = (id) => document.getElementById(id);
+const el = (tag, texto, clase) => {
+  const e = document.createElement(tag);
+  if (texto !== undefined) e.textContent = texto;
+  if (clase) e.className = clase;
+  return e;
+};
+const mostrar = (id) => document.querySelectorAll('.pantalla').forEach((s) => s.classList.toggle('activa', s.id === id));
+
+$('btnEntrar').onclick = async () => {
+  $('errorEntrar').textContent = '';
+  try {
+    const r = await fetch('/api/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clave: $('clave').value }),
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || 'No se pudo entrar.');
+    await signInWithCustomToken(auth, j.token);
+    $('clave').value = '';
+  } catch (err) {
+    $('errorEntrar').textContent = err.message;
+  }
+};
+$('btnSalir').onclick = () => signOut(auth);
+$('filtro').onchange = () => pintar();
+
+onAuthStateChanged(auth, (usuario) => {
+  if (parar) { parar(); parar = null; }
+  if (!usuario) { mostrar('entrar'); return; }
+  mostrar('panel');
+  parar = onValue(ref(db, 'peticiones'), (snap) => {
+    const datos = snap.val() || {};
+    peticiones = Object.entries(datos)
+      .map(([id, p]) => ({ id, ...p }))
+      .sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
+    pintar();
+  }, (err) => { $('cuenta').textContent = 'No se pudo leer: ' + err.message; });
+});
+
+function pintar() {
+  const f = $('filtro').value;
+  const ver = peticiones.filter((p) => f === 'todas' || p.estado === f);
+  $('cuenta').textContent = `${ver.length} petición(es)`;
+  $('lista').replaceChildren(...ver.map(tarjeta));
+}
+
+function tarjeta(p) {
+  const fila = el('article', undefined, 'fila-admin');
+  fila.append(
+    el('small', `${new Date(p.fecha).toLocaleString('es-MX')}. Código ${p.codigo}. Tema: ${p.categoria || 'sin tema'}.`),
+    el('h3', p.nombre || 'Anónimo'),
+    el('p', p.texto),
+    el('p', `Versículo asignado: ${p.versiculo?.cita || 'ninguno'}`),
+  );
+  if (p.telefono) {
+    const a = el('a', `Llamar a ${p.telefono}`);
+    a.href = `tel:${p.telefono}`;
+    fila.append(a);
+  }
+  const botones = el('div', undefined, 'estados');
+  for (const op of ['no contestada', 'contestada']) {
+    const b = el('button', op === 'contestada' ? 'Contestada' : 'Sin contestar', op === p.estado ? 'activo' : '');
+    b.type = 'button';
+    b.onclick = () => update(ref(db), {
+      [`peticiones/${p.id}/estado`]: op,
+      [`codigos/${p.codigo}/estado`]: op,
+    }).catch((err) => alert('No se pudo guardar: ' + err.message));
+    botones.append(b);
+  }
+  const notas = el('textarea');
+  notas.value = p.notas || '';
+  notas.placeholder = 'Notas privadas (solo las ve el panel)';
+  notas.onchange = () => update(ref(db, `peticiones/${p.id}`), { notas: notas.value });
+  fila.append(botones, notas);
+  return fila;
+}
+</script>
+</body>
+</html>
