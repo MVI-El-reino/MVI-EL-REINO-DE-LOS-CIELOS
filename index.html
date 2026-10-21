@@ -57,7 +57,7 @@
       <input id="nombre" type="text" maxlength="60" autocomplete="name">
     </div>
 
-    <label for="telefono">Su celular, si quiere que el pastor le llame (opcional)</label>
+    <label for="telefono">Su celular, si quiere que el pastor le CONTACTE (opcional)</label>
     <input id="telefono" type="tel" inputmode="tel" maxlength="15" autocomplete="tel">
 
     <div class="oculto" aria-hidden="true"><label>No llene este campo <input id="web" tabindex="-1" autocomplete="off"></label></div>
@@ -65,6 +65,13 @@
     <label class="opcion"><input type="checkbox" id="acepto"> Acepto que solo el pastor y el equipo de oración lean mi petición. Leí el <a href="#" data-ir="aviso">aviso de privacidad</a>.</label>
 
     <p id="error" class="error" role="alert"></p>
+
+    <!-- Checkbox para el Muro de Peticiones -->
+<label class="opcion">
+  <input type="checkbox" id="solicitaMuro"> 
+  Deseo que esta petición se publique en el Muro de la Iglesia para que la congregación ore por mí (Su petición será revisada antes de publicarse).
+</label>
+    
     <button class="principal" id="enviar" type="submit">Enviar petición</button>
   </form>
 </section>
