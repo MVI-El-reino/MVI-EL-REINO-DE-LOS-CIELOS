@@ -22,6 +22,7 @@ function mostrar(id) {
   if (id === 'mis') listarMis();
   //Si entra al muro, ejecuta la función de carga
   if (id === 'muro') cargarMuro(); 
+  if (id === 'testimonios') cargarTestimonios();
 }
 
 // Bindeo automático de eventos de navegación basados en el atributo data-ir
@@ -280,5 +281,73 @@ async function cargarMuro() {
 
   } catch (error) {
     contenedor.innerHTML = '<p style="text-align: center; color: var(--alerta);">Ocurrió un error al cargar el muro. Verifica tu conexión a internet.</p>';
+  }
+}
+
+//-------------------------------- Enviar Testimonio------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+$('formTestimonio').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('errorTestimonio').textContent = '';$('btnEnviarTestimonio').disabled = true;
+
+  try {
+    const r = await fetch('/api/testimonio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        texto: $('textoTestimonio').value,
+        nombre: $('nombreTestimonio').value,
+        web: $('webTestimonio').value
+      }),
+    });
+    
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error);
+    
+    e.target.reset();
+    alert('¡Tu testimonio ha sido publicado con éxito!');
+    cargarTestimonios(); // Recarga la lista instantáneamente
+  } catch (err) {
+    $('errorTestimonio').textContent = err.message;
+    $('errorTestimonio').style.display = 'block';
+  } finally {
+    $('btnEnviarTestimonio').disabled = false;
+  }
+});
+
+// Cargar y mostrar testimonios públicos
+async function cargarTestimonios() {
+  const contenedor = $('listaTestimonios');
+  contenedor.innerHTML = '<p style="text-align: center;">Cargando...</p>';
+
+  try {
+    const r = await fetch(`${CONFIG.DB}/testimonios.json`);
+    const data = await r.json();
+
+    if (!data) {
+      contenedor.innerHTML = '<p style="text-align: center; color: var(--texto-suave);">Aún no hay testimonios. ¡Sé el primero en testificar!</p>';
+      return;
+    }
+
+    const lista = Object.entries(data).map(([id, t]) => ({ id, ...t })).sort((a, b) => b.fecha - a.fecha);
+    contenedor.innerHTML = ''; 
+
+    lista.forEach(t => {
+      const fechaStr = new Date(t.fecha).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+      const div = document.createElement('div');
+      div.className = 'fila-admin'; 
+      div.style.padding = '20px';
+      
+      div.innerHTML = `
+        <div style="font-size: 2rem; float: left; margin-right: 15px; opacity: 0.2; color: var(--acento);">❝</div>
+        <h3 style="font-size: 1.2rem; margin: 0 0 6px 0; color: var(--acento-texto);">${t.nombre}</h3>
+        <small style="display: block; color: var(--texto-suave); margin-bottom: 12px;">${fechaStr}</small>
+        <p style="font-size: 1.15rem; line-height: 1.6; margin: 0; font-style: italic;">${t.texto}</p>
+        <div style="clear: both;"></div>
+      `;
+      contenedor.appendChild(div);
+    });
+  } catch (error) {
+    contenedor.innerHTML = '<p style="text-align: center; color: var(--alerta);">Error al cargar los testimonios.</p>';
   }
 }
