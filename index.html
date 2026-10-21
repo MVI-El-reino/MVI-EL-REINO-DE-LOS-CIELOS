@@ -26,12 +26,26 @@
 <section id="inicio" class="pantalla activa">
   <p>Aquí puede dejar su petición de oración. Recibirá un versículo para su situación y, si lo desea, el pastor le puede ayudar personalmente.</p>
   <nav>
-    <button class="fila" data-ir="pedir" type="button">Pedir oración</button>
-    <button class="fila" data-ir="mis" type="button">Mis peticiones</button>
-    <button class="fila" data-ir="conocer" type="button">Conocer más</button>
-  </nav>
+  <button class="fila" data-ir="pedir" type="button">Pedir oración</button>
+  <button class="fila principal" data-ir="muro" type="button" style="justify-content: center; text-align: center;"> Muro de Peticiones</button>
+  <button class="fila" data-ir="mis" type="button">Mis peticiones</button>
+  <button class="fila" data-ir="conocer" type="button">Conocer más</button>
+</nav>
 </section>
-
+<!--MURO DE PETICIONES PÚBLICAS -->
+<section id="muro" class="pantalla">
+  <h2>Muro de Oración</h2>
+  <p>Únete en oración por estas necesidades. Las peticiones con la etiqueta dorada son testimonios de que Dios ya contestó.</p>
+  
+  <!-- Aquí se inyectarán las peticiones desde app.js -->
+  <div id="contenedorMuro" style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+    <!-- Estado de carga inicial -->
+    <p style="text-align: center;">Cargando peticiones...</p>
+  </div>
+  
+  <button class="secundario" data-ir="inicio" type="button" style="margin-top: 24px;">Volver al inicio</button>
+</section>
+  
 <section id="pedir" class="pantalla">
   <h2>Escriba su petición</h2>
   <form id="formulario">
