@@ -17,8 +17,11 @@ let ultimo = null;
  */
 function mostrar(id) {
   document.querySelectorAll('.pantalla').forEach((s) => s.classList.toggle('activa', s.id === id));
-  window.scrollTo(0, 0); // Resetea el scroll al inicio al cambiar de vista
-  if (id === 'mis') listarMis(); // Refresca el LocalStorage al entrar al historial
+  window.scrollTo(0, 0);
+  
+  if (id === 'mis') listarMis();
+  //Si entra al muro, ejecuta la función de carga
+  if (id === 'muro') cargarMuro(); 
 }
 
 // Bindeo automático de eventos de navegación basados en el atributo data-ir
@@ -202,7 +205,7 @@ function listarMis() {
       try {
         const d = await (await fetch(`${CONFIG.DB}/codigos/${codigo}.json`)).json();
         estado.textContent = d
-          ? `Estado: ${d.estado === 'contestada' ? 'Contestada 🙏' : 'Aún orando por ti.'} (${d.versiculo.cita})`
+          ? `Estado: ${d.estado === 'contestada' ? 'Contestada' : 'Aún orando por ti.'} (${d.versiculo.cita})`
           : 'No encontramos el código en el sistema.';
       } catch {
         estado.textContent = 'Error de conexión. Intente en un momento.';
@@ -213,4 +216,69 @@ function listarMis() {
     li.append(cod, estado, btn);
     ul.append(li);
   });
+}
+/**
+ * RENDERIZADO DEL MURO PÚBLICO
+ * Descarga las peticiones aprobadas desde un nodo público seguro y genera las tarjetas.
+ */
+async function cargarMuro() {
+  const contenedor = $('contenedorMuro');
+  contenedor.innerHTML = '<p style="text-align: center;">Cargando peticiones...</p>';
+
+  try {
+    // Consulta al nodo /muro.json (Solo contiene peticiones aprobadas por el pastor)
+    const r = await fetch(`${CONFIG.DB}/muro.json`);
+    const data = await r.json();
+
+    if (!data) {
+      contenedor.innerHTML = '<p style="text-align: center; color: var(--texto-suave);">Aún no hay peticiones en el muro. ¡Sé el primero en compartir tu necesidad!</p>';
+      return;
+    }
+
+    // Convertir el objeto de Firebase en un Array y ordenarlo por fecha (más recientes arriba)
+    const peticionesMuro = Object.entries(data)
+      .map(([id, p]) => ({ id, ...p }))
+      .sort((a, b) => b.fecha - a.fecha);
+
+    contenedor.innerHTML = ''; // Limpiar el estado de carga
+
+    peticionesMuro.forEach(p => {
+      // 1. Crear la tarjeta base
+      const div = document.createElement('div');
+      div.className = 'fila-admin'; // Usamos la clase de CSS existente que hace que parezca tarjeta
+      div.style.padding = '20px';
+
+      // 2. Determinar si mostramos el nombre o "Anónimo"
+      const nombreMostrar = p.anonimo ? 'Petición Anónima' : (p.nombre || 'Petición Anónima');
+      
+      // 3. Formatear la fecha (Ej: 14 de octubre)
+      const fechaStr = new Date(p.fecha).toLocaleDateString('es-MX', { day: 'numeric', month: 'long' });
+
+      // 4. Lógica Visual para Peticiones Contestadas
+      let badgeContestada = '';
+      if (p.estado === 'contestada') {
+        badgeContestada = `
+          <div style="background: var(--acento); color: var(--sobre); padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; display: inline-block; margin-bottom: 12px;">
+            ¡Oración Contestada!
+          </div>
+        `;
+      }
+
+      // 5. Ensamblar el HTML de la tarjeta
+      div.innerHTML = `
+        ${badgeContestada}
+        <small style="display: block; color: var(--texto-suave); margin-bottom: 6px;">${fechaStr}</small>
+        <h3 style="font-size: 1.2rem; margin: 0 0 10px 0;">${nombreMostrar}</h3>
+        <p style="font-size: 1.1rem; line-height: 1.5; margin: 0 0 14px 0;">"${p.texto}"</p>
+        <p class="nota" style="font-size: 0.95rem; font-style: italic; border-left: 3px solid var(--acento); padding-left: 10px;">
+          Dios prometió: ${p.versiculo.cita}
+        </p>
+      `;
+      
+      contenedor.appendChild(div);
+    });
+
+  } catch (error) {
+    contenedor.innerHTML = '<p style="text-align: center; color: var(--alerta);">Ocurrió un error al cargar el muro. Verifica tu conexión a internet.</p>';
+  }
 }
