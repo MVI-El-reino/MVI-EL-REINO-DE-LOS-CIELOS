@@ -23,6 +23,11 @@
 </section>
 
 <section id="panel" class="pantalla">
+  <label for="modulo">Módulo</label>
+<select id="modulo">
+  <option value="peticiones">Gestión de Peticiones</option>
+  <option value="testimonios">Gestión de Testimonios</option>
+</select>
   <label for="filtro">Mostrar</label>
   <select id="filtro">
     <option value="todas">Todas</option>
@@ -39,9 +44,8 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, signInWithCustomToken, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getDatabase, ref, onValue, update } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+import { getDatabase, ref, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
-// Pegue aquí la configuración web de Firebase (Configuración del proyecto, sección Sus apps).
 const app = initializeApp({
   apiKey: 'AIzaSyAJ8ObKdI2xzw5o51h1BgDWPvnIxoS6xrk',
   authDomain: 'peticiones-mvi.firebaseapp.com',
@@ -49,10 +53,14 @@ const app = initializeApp({
   projectId: 'peticiones-mvi',
   appId: '1:570960184669:web:d75cda51c83be56eca94b4',
 });
+
 const auth = getAuth(app);
 const db = getDatabase(app);
 let peticiones = [];
-let parar = null;
+let testimonios = [];
+let pararPeticiones = null;
+let pararTestimonios = null;
+
 const $ = (id) => document.getElementById(id);
 const el = (tag, texto, clase) => {
   const e = document.createElement(tag);
@@ -62,8 +70,7 @@ const el = (tag, texto, clase) => {
 };
 const mostrar = (id) => document.querySelectorAll('.pantalla').forEach((s) => s.classList.toggle('activa', s.id === id));
 
-$('btnEntrar').onclick = async () => {
-  $('errorEntrar').textContent = '';
+$('btnEntrar').onclick = async () => {$('errorEntrar').textContent = '';
   try {
     const r = await fetch('/api/admin-login', {
       method: 'POST',
@@ -78,39 +85,76 @@ $('btnEntrar').onclick = async () => {
     $('errorEntrar').textContent = err.message;
   }
 };
+
 $('btnSalir').onclick = () => signOut(auth);
-$('filtro').onchange = () => pintar();
+
+// Repintar al cambiar de opciones
+$('filtro').onchange = () => pintarVista();$('modulo').onchange = () => {
+  $('filtro').style.display =$('modulo').value === 'testimonios' ? 'none' : 'block';
+  pintarVista();
+};
 
 onAuthStateChanged(auth, (usuario) => {
-  if (parar) { parar(); parar = null; }
+  if (pararPeticiones) { pararPeticiones(); pararPeticiones = null; }
+  if (pararTestimonios) { pararTestimonios(); pararTestimonios = null; }
+  
   if (!usuario) { mostrar('entrar'); return; }
   mostrar('panel');
-  parar = onValue(ref(db, 'peticiones'), (snap) => {
+
+  // Escuchar Peticiones
+  pararPeticiones = onValue(ref(db, 'peticiones'), (snap) => {
     const datos = snap.val() || {};
-    peticiones = Object.entries(datos)
-      .map(([id, p]) => ({ id, ...p }))
-      .sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
-    pintar();
-  }, (err) => { $('cuenta').textContent = 'No se pudo leer: ' + err.message; });
+    peticiones = Object.entries(datos).map(([id, p]) => ({ id, ...p })).sort((a, b) => b.fecha - a.fecha);
+    if($('modulo').value === 'peticiones') pintarVista();
+  });
+
+  // Escuchar Testimonios
+  pararTestimonios = onValue(ref(db, 'testimonios'), (snap) => {
+    const datos = snap.val() || {};
+    testimonios = Object.entries(datos).map(([id, p]) => ({ id, ...p })).sort((a, b) => b.fecha - a.fecha);
+    if($('modulo').value === 'testimonios') pintarVista();
+  });
 });
 
-function pintar() {
-  const f = $('filtro').value;
-  const ver = peticiones.filter((p) => f === 'todas' || p.estado === f);
-  $('cuenta').textContent = `${ver.length} petición(es)`;
-  $('lista').replaceChildren(...ver.map(tarjeta));
+function pintarVista() {
+  if ($('modulo').value === 'peticiones') {
+    const f = $('filtro').value;
+    const ver = peticiones.filter((p) => f === 'todas' || p.estado === f);
+    $('cuenta').textContent = `${ver.length} petición(es)`;
+    $('lista').replaceChildren(...ver.map(tarjetaPeticion));
+  } else {
+    $('cuenta').textContent = `${testimonios.length} testimonio(s) públicos`;
+    $('lista').replaceChildren(...testimonios.map(tarjetaTestimonio));
+  }
 }
 
-function tarjeta(p) {
+// TARJETA DE TESTIMONIOS (CON BOTÓN ELIMINAR)
+function tarjetaTestimonio(t) {
   const fila = el('article', undefined, 'fila-admin');
-  
-  // 1. Indicador visual si el usuario pidió estar en el muro
-  let badgeMuro = '';
-  if (p.solicitaMuro) {
-    badgeMuro = ' 📌 (Pidió estar en el Muro)';
-  }
+  fila.append(
+    el('small', `${new Date(t.fecha).toLocaleString('es-MX')} - Público`),
+    el('h3', t.nombre),
+    el('p', t.texto)
+  );
 
-  // 2. Encabezado de la petición
+  const btnEliminar = el('button', 'Eliminar Testimonio Definitivamente', 'secundario');
+  btnEliminar.style.borderColor = 'var(--alerta)';
+  btnEliminar.style.color = 'var(--alerta)';
+  btnEliminar.onclick = () => {
+    if (confirm('¿Seguro que quieres borrar este testimonio? Desaparecerá de la página pública.')) {
+      remove(ref(db, `testimonios/${t.id}`)).catch((err) => alert('No se pudo borrar: ' + err.message));
+    }
+  };
+  
+  fila.append(btnEliminar);
+  return fila;
+}
+
+// TARJETA DE PETICIONES ORIGINAL
+function tarjetaPeticion(p) {
+  const fila = el('article', undefined, 'fila-admin');
+  let badgeMuro = p.solicitaMuro ? ' 📌 (Pidió Muro)' : '';
+  
   fila.append(
     el('small', `${new Date(p.fecha).toLocaleString('es-MX')}. Código ${p.codigo}. Tema: ${p.categoria || 'sin tema'}.${badgeMuro}`),
     el('h3', p.nombre || 'Anónimo'),
@@ -118,7 +162,6 @@ function tarjeta(p) {
     el('p', `Versículo asignado: ${p.versiculo?.cita || 'ninguno'}`)
   );
 
-  // 3. Botón de llamada (si aplica)
   if (p.telefono) {
     const a = el('a', `Llamar a ${p.telefono}`);
     a.href = `tel:${p.telefono}`;
@@ -127,75 +170,45 @@ function tarjeta(p) {
     fila.append(a);
   }
 
-  // 4. Contenedor de botones de estado (Contestada / No Contestada)
   const botonesEstado = el('div', undefined, 'estados');
   for (const op of ['no contestada', 'contestada']) {
     const b = el('button', op === 'contestada' ? 'Contestada 🙏' : 'Sin contestar', op === p.estado ? 'activo' : '');
     b.type = 'button';
     b.onclick = () => {
-      // Prepara las actualizaciones para la BD principal
       const updates = {
         [`peticiones/${p.id}/estado`]: op,
         [`codigos/${p.codigo}/estado`]: op,
       };
-      
-      // SINCRONIZACIÓN CLAVE: Si ya está publicada, actualiza el estado en el muro también
-      if (p.visibilidad === 'publicada') {
-        updates[`muro/${p.id}/estado`] = op;
-      }
-      
+      if (p.visibilidad === 'publicada') updates[`muro/${p.id}/estado`] = op;
       update(ref(db), updates).catch((err) => alert('No se pudo guardar: ' + err.message));
     };
     botonesEstado.append(b);
   }
 
-  // 5. Botón para Publicar/Quitar del Muro Público
   const btnMuro = el('button', p.visibilidad === 'publicada' ? 'Quitar del Muro Público' : 'Publicar en Muro Público');
-  
-  // Destacar el botón visualmente si el usuario lo solicitó pero aún no se publica
-  if (p.visibilidad === 'publicada') {
-     btnMuro.className = 'secundario'; // Botón gris porque ya está publicado
-  } else if (p.solicitaMuro) {
-     btnMuro.className = 'principal'; // Botón dorado/llamativo porque el usuario lo está pidiendo
-  } else {
-     btnMuro.className = ''; // Botón estándar (borde simple)
-  }
+  if (p.visibilidad === 'publicada') btnMuro.className = 'secundario';
+  else if (p.solicitaMuro) btnMuro.className = 'principal';
   
   btnMuro.onclick = () => {
     if (p.visibilidad !== 'publicada') {
-      if (!confirm('¿Estás seguro de publicar esta petición para que todos la vean en la página web?')) return;
-      
-      // Copia solo los datos seguros (excluye teléfono, IP, etc.)
-      const datosMuro = {
-        texto: p.texto,
-        nombre: p.nombre,
-        anonimo: p.anonimo,
-        fecha: p.fecha,
-        versiculo: p.versiculo,
-        estado: p.estado 
-      };
-      
+      if (!confirm('¿Seguro de publicar en el Muro Web?')) return;
       update(ref(db), {
         [`peticiones/${p.id}/visibilidad`]: 'publicada',
-        [`muro/${p.id}`]: datosMuro
-      }).catch((err) => alert('Error al publicar: ' + err.message));
-      
+        [`muro/${p.id}`]: { texto: p.texto, nombre: p.nombre, anonimo: p.anonimo, fecha: p.fecha, versiculo: p.versiculo, estado: p.estado }
+      }).catch((err) => alert('Error: ' + err.message));
     } else {
-      // Si ya está publicada, al presionar el botón se borra del nodo público
       update(ref(db), {
         [`peticiones/${p.id}/visibilidad`]: 'privada',
         [`muro/${p.id}`]: null
-      }).catch((err) => alert('Error al quitar: ' + err.message));
+      }).catch((err) => alert('Error: ' + err.message));
     }
   };
 
-  // 6. Notas privadas del pastor
   const notas = el('textarea');
   notas.value = p.notas || '';
-  notas.placeholder = 'Notas pastorales (solo las ve el panel)';
+  notas.placeholder = 'Notas pastorales...';
   notas.onchange = () => update(ref(db, `peticiones/${p.id}`), { notas: notas.value });
   
-  // Empaqueta todo en la tarjeta
   fila.append(botonesEstado, btnMuro, notas);
   return fila;
 }
