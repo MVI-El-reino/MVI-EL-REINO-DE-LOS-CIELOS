@@ -103,32 +103,100 @@ function pintar() {
 
 function tarjeta(p) {
   const fila = el('article', undefined, 'fila-admin');
+  
+  // 1. Indicador visual si el usuario pidió estar en el muro
+  let badgeMuro = '';
+  if (p.solicitaMuro) {
+    badgeMuro = ' 📌 (Pidió estar en el Muro)';
+  }
+
+  // 2. Encabezado de la petición
   fila.append(
-    el('small', `${new Date(p.fecha).toLocaleString('es-MX')}. Código ${p.codigo}. Tema: ${p.categoria || 'sin tema'}.`),
+    el('small', `${new Date(p.fecha).toLocaleString('es-MX')}. Código ${p.codigo}. Tema: ${p.categoria || 'sin tema'}.${badgeMuro}`),
     el('h3', p.nombre || 'Anónimo'),
     el('p', p.texto),
-    el('p', `Versículo asignado: ${p.versiculo?.cita || 'ninguno'}`),
+    el('p', `Versículo asignado: ${p.versiculo?.cita || 'ninguno'}`)
   );
+
+  // 3. Botón de llamada (si aplica)
   if (p.telefono) {
     const a = el('a', `Llamar a ${p.telefono}`);
     a.href = `tel:${p.telefono}`;
+    a.style.display = 'block';
+    a.style.marginBottom = '10px';
     fila.append(a);
   }
-  const botones = el('div', undefined, 'estados');
+
+  // 4. Contenedor de botones de estado (Contestada / No Contestada)
+  const botonesEstado = el('div', undefined, 'estados');
   for (const op of ['no contestada', 'contestada']) {
-    const b = el('button', op === 'contestada' ? 'Contestada' : 'Sin contestar', op === p.estado ? 'activo' : '');
+    const b = el('button', op === 'contestada' ? 'Contestada 🙏' : 'Sin contestar', op === p.estado ? 'activo' : '');
     b.type = 'button';
-    b.onclick = () => update(ref(db), {
-      [`peticiones/${p.id}/estado`]: op,
-      [`codigos/${p.codigo}/estado`]: op,
-    }).catch((err) => alert('No se pudo guardar: ' + err.message));
-    botones.append(b);
+    b.onclick = () => {
+      // Prepara las actualizaciones para la BD principal
+      const updates = {
+        [`peticiones/${p.id}/estado`]: op,
+        [`codigos/${p.codigo}/estado`]: op,
+      };
+      
+      // SINCRONIZACIÓN CLAVE: Si ya está publicada, actualiza el estado en el muro también
+      if (p.visibilidad === 'publicada') {
+        updates[`muro/${p.id}/estado`] = op;
+      }
+      
+      update(ref(db), updates).catch((err) => alert('No se pudo guardar: ' + err.message));
+    };
+    botonesEstado.append(b);
   }
+
+  // 5. Botón para Publicar/Quitar del Muro Público
+  const btnMuro = el('button', p.visibilidad === 'publicada' ? 'Quitar del Muro Público' : 'Publicar en Muro Público');
+  
+  // Destacar el botón visualmente si el usuario lo solicitó pero aún no se publica
+  if (p.visibilidad === 'publicada') {
+     btnMuro.className = 'secundario'; // Botón gris porque ya está publicado
+  } else if (p.solicitaMuro) {
+     btnMuro.className = 'principal'; // Botón dorado/llamativo porque el usuario lo está pidiendo
+  } else {
+     btnMuro.className = ''; // Botón estándar (borde simple)
+  }
+  
+  btnMuro.onclick = () => {
+    if (p.visibilidad !== 'publicada') {
+      if (!confirm('¿Estás seguro de publicar esta petición para que todos la vean en la página web?')) return;
+      
+      // Copia solo los datos seguros (excluye teléfono, IP, etc.)
+      const datosMuro = {
+        texto: p.texto,
+        nombre: p.nombre,
+        anonimo: p.anonimo,
+        fecha: p.fecha,
+        versiculo: p.versiculo,
+        estado: p.estado 
+      };
+      
+      update(ref(db), {
+        [`peticiones/${p.id}/visibilidad`]: 'publicada',
+        [`muro/${p.id}`]: datosMuro
+      }).catch((err) => alert('Error al publicar: ' + err.message));
+      
+    } else {
+      // Si ya está publicada, al presionar el botón se borra del nodo público
+      update(ref(db), {
+        [`peticiones/${p.id}/visibilidad`]: 'privada',
+        [`muro/${p.id}`]: null
+      }).catch((err) => alert('Error al quitar: ' + err.message));
+    }
+  };
+
+  // 6. Notas privadas del pastor
   const notas = el('textarea');
   notas.value = p.notas || '';
-  notas.placeholder = 'Notas privadas (solo las ve el panel)';
+  notas.placeholder = 'Notas pastorales (solo las ve el panel)';
   notas.onchange = () => update(ref(db, `peticiones/${p.id}`), { notas: notas.value });
-  fila.append(botones, notas);
+  
+  // Empaqueta todo en la tarjeta
+  fila.append(botonesEstado, btnMuro, notas);
   return fila;
 }
 </script>
