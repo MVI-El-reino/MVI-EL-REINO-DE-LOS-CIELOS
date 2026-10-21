@@ -60,6 +60,9 @@ module.exports = async function handler(req, res) {
   const anonimo = b.anonimo === true;
   const nombre = anonimo ? '' : String(b.nombre || '').trim().slice(0, 60);
   const telefono = String(b.telefono || '').replace(/\D/g, '').slice(0, 15);
+  // CAPTURA EL NUEVO CAMPO DEL MURO
+  const solicitaMuro = b.muro === true;
+
   if (texto.length < 5 || texto.length > 800) {
     return res.status(400).json({ error: 'Escriba su petición. Debe tener entre 5 y 800 letras.' });
   }
@@ -84,8 +87,23 @@ module.exports = async function handler(req, res) {
     const codigo = codigoNuevo();
     const fecha = Date.now();
     const id = db.ref('peticiones').push().key;
+    
+    // GUARDA LA PETICIÓN CON EL NUEVO CAMPO "solicitaMuro" y "visibilidad"
     await db.ref().update({
-      [`peticiones/${id}`]: { texto, categoria, anonimo, nombre, telefono, codigo, estado: 'no contestada', versiculo, fecha, notas: '' },
+      [`peticiones/${id}`]: { 
+        texto, 
+        categoria, 
+        anonimo, 
+        nombre, 
+        telefono, 
+        codigo, 
+        estado: 'no contestada', // Esto lo cambiará el pastor en admin.html
+        visibilidad: 'privada', // Por defecto es privada hasta que el pastor la apruebe
+        solicitaMuro, // Saber si el usuario quiso hacerla pública
+        versiculo, 
+        fecha, 
+        notas: '' 
+      },
       [`codigos/${codigo}`]: { estado: 'no contestada', versiculo, fecha },
     });
     res.status(200).json({ codigo, versiculo });
