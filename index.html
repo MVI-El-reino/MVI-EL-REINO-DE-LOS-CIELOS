@@ -28,6 +28,7 @@
   <nav>
   <button class="fila" data-ir="pedir" type="button">Pedir oración</button>
   <button class="fila principal" data-ir="muro" type="button" style="justify-content: center; text-align: center;"> Muro de Peticiones</button>
+  <button class="fila" data-ir="testimonios" type="button">Mural de Testimonios</button>
   <button class="fila" data-ir="mis" type="button">Mis peticiones</button>
   <button class="fila" data-ir="conocer" type="button">Conocer más</button>
 </nav>
@@ -41,6 +42,36 @@
   <div id="contenedorMuro" style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
     <!-- Estado de carga inicial -->
     <p style="text-align: center;">Cargando peticiones...</p>
+  </div>
+  
+  <button class="secundario" data-ir="inicio" type="button" style="margin-top: 24px;">Volver al inicio</button>
+</section>
+  
+<!--MURAL DE TESTIMINIOS-->
+  <section id="testimonios" class="pantalla">
+  <h2>Mural de Testimonios</h2>
+  <p>Comparte lo que Dios ha hecho en tu vida para animar la fe de otros.</p>
+
+  <!-- Tarjeta para escribir el testimonio -->
+  <div class="tarjeta" style="background: var(--superficie); padding: 20px; border-radius: 12px; border: 1px solid var(--borde); margin-bottom: 30px;">
+    <form id="formTestimonio">
+      <label for="textoTestimonio">¿Qué milagro o respuesta recibiste?</label>
+      <textarea id="textoTestimonio" rows="4" placeholder="Dios me sanó de..." required></textarea>
+      
+      <label for="nombreTestimonio">Tu nombre (Opcional)</label>
+      <input type="text" id="nombreTestimonio" placeholder="Déjalo en blanco para ser anónimo">
+      
+      <!-- Campo oculto para atrapar bots -->
+      <div class="oculto" aria-hidden="true"><input id="webTestimonio" tabindex="-1"></div>
+      
+      <p id="errorTestimonio" class="error"></p>
+      <button class="principal" id="btnEnviarTestimonio" type="submit">Publicar mi Testimonio</button>
+    </form>
+  </div>
+
+  <!-- Lista donde aparecerán los testimonios publicados -->
+  <div id="listaTestimonios" style="display: flex; flex-direction: column; gap: 16px;">
+    <p style="text-align: center;">Cargando testimonios...</p>
   </div>
   
   <button class="secundario" data-ir="inicio" type="button" style="margin-top: 24px;">Volver al inicio</button>
