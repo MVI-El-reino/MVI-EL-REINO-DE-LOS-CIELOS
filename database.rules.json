@@ -1,17 +1,23 @@
 {
   "rules": {
     "peticiones": {
-      ".read": "auth.token.admin === true",
-      "$id": {
-        ".write": "auth.token.admin === true",
-        "estado": { ".validate": "newData.val() == 'contestada' || newData.val() == 'no contestada'" }
-      }
+      ".read": "auth != null && auth.token.admin == true",
+      ".write": false
     },
     "codigos": {
+      ".read": "auth == null",
+      ".write": false,
       "$codigo": {
-        ".read": true,
-        ".write": "auth.token.admin === true"
+        ".read": "auth == null"
       }
+    },
+    "muro": {
+      ".read": true,
+      ".write": false
+    },
+    "diagnostico": {
+      ".read": false,
+      ".write": "auth != null && auth.token.admin == true"
     }
   }
 }
