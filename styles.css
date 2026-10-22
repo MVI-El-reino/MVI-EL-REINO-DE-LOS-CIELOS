@@ -344,3 +344,40 @@ input[type=checkbox]:checked::after {
 
 .fijo .ayuda { min-height: 68px; margin: 0; font-size: 1.25rem; }
 .fijo .llamar { min-height: 50px; margin: 0; font-size: 1rem; font-weight: 400; }
+
+/* Botón de retroceso circular */
+.btn-regresar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;         /* Ancho fijo para hacer el círculo */
+  height: 44px;
+  min-height: 44px;    /* Sobrescribe el alto de los botones normales */
+  margin: 0 0 16px 0;
+  padding: 0;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 50%;
+  color: var(--texto);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-regresar:hover {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: var(--sobre);
+  transform: translateX(-3px); /* Pequeño salto hacia la izquierda indicando "volver" */
+}
+
+/* Dibuja la flecha limpia sin cargar imágenes externas */
+.btn-regresar svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
