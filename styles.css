@@ -47,22 +47,45 @@ a {
 
 p { margin: 0 0 14px; }
 
+/* ========================================================= */
+/* HEADER REDISEÑADO (Estilo App Móvil: Horizontal y Sutil) */
+/* ========================================================= */
 header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Coloca el logo y el texto lado a lado */
   align-items: center;
-  text-align: center;
-  gap: 6px;
-  padding: 28px 0 22px;
+  justify-content: center; /* Mantiene el conjunto centrado en la pantalla */
+  gap: 16px; /* Separación entre el escudo y las letras */
+  padding: 16px 20px; /* Relleno reducido para no abarcar tanta pantalla */
+  background: var(--fondo);
   border-bottom: 1px solid var(--borde);
 }
+/*-------------------------------------------------------------HEADER------------------------------------------*/
+/* Reducimos el logo para que sea un ícono de acompañamiento */
+header img { 
+  width: 54px; 
+  height: 54px; 
+  flex-shrink: 0; 
+}
 
-header img { width: 84px; height: 84px; }
+/* El bloque de texto se alinea a la izquierda del logo */
+header div {
+  text-align: left;
+}
 
-header p {
-  margin: 2px 0 0;
-  color: var(--texto-suave);
-  font-size: 1rem;
+/* Título un poco más compacto pero conservando su fuente elegante */
+header h1 { 
+  font-size: 1.35rem; 
+  margin: 0 0 2px 0; /* Menos margen inferior */
+  letter-spacing: .02em;
+}
+
+/* Subtítulos más discretos */
+header p { 
+  margin: 0; 
+  color: var(--texto-suave); 
+  font-size: 0.85rem; 
+  line-height: 1.3;
 }
 
 h1, h2, h3 {
@@ -345,21 +368,24 @@ input[type=checkbox]:checked::after {
 .fijo .ayuda { min-height: 68px; margin: 0; font-size: 1.25rem; }
 .fijo .llamar { min-height: 50px; margin: 0; font-size: 1rem; font-weight: 400; }
 
-/* Botón de retroceso circular */
+/* Botón de retroceso circular FIJO en la esquina superior derecha */
 .btn-regresar {
-  display: inline-flex;
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 1000; /* Asegura que siempre esté por encima de todo */
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;         /* Ancho fijo para hacer el círculo */
-  height: 44px;
-  min-height: 44px;    /* Sobrescribe el alto de los botones normales */
-  margin: 0 0 16px 0;
+  width: 46px;
+  height: 46px;
+  margin: 0;
   padding: 0;
-  background: var(--superficie);
+  background: var(--superficie); 
   border: 1px solid var(--borde);
   border-radius: 50%;
   color: var(--texto);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6); /* Sombra oscura para dar efecto flotante */
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -368,13 +394,13 @@ input[type=checkbox]:checked::after {
   background: var(--acento);
   border-color: var(--acento);
   color: var(--sobre);
-  transform: translateX(-3px); /* Pequeño salto hacia la izquierda indicando "volver" */
+  transform: scale(1.05); /* Crece ligeramente al tocarlo */
 }
 
-/* Dibuja la flecha limpia sin cargar imágenes externas */
+/* Dibuja la flecha apuntando a la izquierda */
 .btn-regresar svg {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   stroke: currentColor;
   stroke-width: 2.5;
   stroke-linecap: round;
