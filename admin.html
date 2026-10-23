@@ -151,11 +151,11 @@ function tarjetaTestimonio(t) {
 }
 
 // TARJETA DE PETICIONES ORIGINAL
-// TARJETA DE PETICIONES ACTUALIZADA
+// TARJETA DE PETICIONES ACTUALIZADA (Versión limpia)
 function tarjetaPeticion(p) {
   const fila = el('article', undefined, 'fila-admin');
   
-  // 1. Detectar si la petición es pública o privada (soporta el código nuevo y viejo)
+  // 1. Detectar si la petición es pública o privada
   const quiereMuro = p.muro === true || p.solicitaMuro === true;
   
   // 2. Crear el encabezado con las etiquetas visuales
@@ -217,51 +217,51 @@ function tarjetaPeticion(p) {
         [`peticiones/${p.id}/estado`]: op,
         [`codigos/${p.codigo}/estado`]: op,
       };
-      // Solo actualiza el estado en el muro si actualmente está visible ahí
-      if (p.visibilidad === 'publicada') updates[`muro/${p.id}/estado`] = op;[cite: 10]
-      update(ref(db), updates).catch((err) => alert('No se pudo guardar: ' + err.message));[cite: 10]
+      if (p.visibilidad === 'publicada') updates[`muro/${p.id}/estado`] = op;
+      update(ref(db), updates).catch((err) => alert('No se pudo guardar: ' + err.message));
     };
     botonesEstado.append(b);
   }
 
   // 7. Botón del Muro Público
-  const btnMuro = el('button', p.visibilidad === 'publicada' ? 'Quitar del Muro Público' : 'Publicar en Muro Público');[cite: 10]
+  const btnMuro = el('button', p.visibilidad === 'publicada' ? 'Quitar del Muro Público' : 'Publicar en Muro Público');
   if (p.visibilidad === 'publicada') {
-    btnMuro.className = 'secundario';[cite: 10]
+    btnMuro.className = 'secundario';
   } else if (quiereMuro) {
-    btnMuro.className = 'principal'; // Botón destacado si el usuario lo pidió
+    btnMuro.className = 'principal'; 
   } else {
     btnMuro.className = 'secundario';
-    btnMuro.style.opacity = '0.6'; // Botón opaco si es privada, para evitar publicarla por accidente
+    btnMuro.style.opacity = '0.6'; 
   }
   
   btnMuro.onclick = () => {
-    if (p.visibilidad !== 'publicada') {[cite: 10]
+    if (p.visibilidad !== 'publicada') {
       if (!quiereMuro && !confirm('ATENCIÓN: El usuario pidió que esta petición sea PRIVADA. ¿Seguro que deseas publicarla en el Muro Web?')) return;
-      if (quiereMuro && !confirm('¿Seguro de publicar en el Muro Web?')) return;[cite: 10]
+      if (quiereMuro && !confirm('¿Seguro de publicar en el Muro Web?')) return;
       
       update(ref(db), {
-        [`peticiones/${p.id}/visibilidad`]: 'publicada',[cite: 10]
-        [`muro/${p.id}`]: { texto: p.texto, nombre: p.nombre, anonimo: p.anonimo, fecha: p.fecha, versiculo: p.versiculo, estado: p.estado }[cite: 10]
-      }).catch((err) => alert('Error: ' + err.message));[cite: 10]
+        [`peticiones/${p.id}/visibilidad`]: 'publicada',
+        [`muro/${p.id}`]: { texto: p.texto, nombre: p.nombre, anonimo: p.anonimo, fecha: p.fecha, versiculo: p.versiculo, estado: p.estado }
+      }).catch((err) => alert('Error: ' + err.message));
     } else {
       update(ref(db), {
-        [`peticiones/${p.id}/visibilidad`]: 'privada',[cite: 10]
-        [`muro/${p.id}`]: null[cite: 10]
-      }).catch((err) => alert('Error: ' + err.message));[cite: 10]
+        [`peticiones/${p.id}/visibilidad`]: 'privada',
+        [`muro/${p.id}`]: null
+      }).catch((err) => alert('Error: ' + err.message));
     }
   };
 
   // 8. Notas Pastorales
-  const notas = el('textarea');[cite: 10]
-  notas.value = p.notas || '';[cite: 10]
-  notas.placeholder = 'Notas pastorales... (Ocultas al público)';[cite: 10]
+  const notas = el('textarea');
+  notas.value = p.notas || '';
+  notas.placeholder = 'Notas pastorales... (Ocultas al público)';
   notas.style.marginTop = '10px';
-  notas.onchange = () => update(ref(db, `peticiones/${p.id}`), { notas: notas.value });[cite: 10]
+  notas.onchange = () => update(ref(db, `peticiones/${p.id}`), { notas: notas.value });
   
-  fila.append(botonesEstado, btnMuro, notas);[cite: 10]
-  return fila;[cite: 10]
+  fila.append(botonesEstado, btnMuro, notas);
+  return fila;
 }
+  
 </script>
 </body>
 </html>
