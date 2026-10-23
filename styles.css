@@ -1,16 +1,16 @@
 :root {
-  --fondo: #121212;
-  --superficie: #1B1B1B;
-  --texto: #F5EFE0;
-  --texto-suave: #CFC6B0;
-  --acento: #D4AF37;
-  --acento-texto: #D4AF37;
-  --borde: #8A7330;
-  --sobre: #121212;
-  --alerta: #F2B8B5;
-  /* Profundidad para separar elementos interactivos en modo oscuro */
-  --sombra-app: 0 4px 16px rgba(0, 0, 0, 0.4); 
+  --fondo: #FAF6F0; /* Color hueso cálido y relajante (amigable a la vista) */
+  --superficie: #FFFFFF; /* Blanco puro para las tarjetas, genera contraste claro */
+  --texto: #2C2420; /* Marrón muy oscuro, casi negro, ideal para adultos mayores */
+  --texto-suave: #73655D; /* Gris cálido para textos secundarios */
+  --acento: #D4AF37; /* Dorado clásico que hace juego con tu logo */
+  --acento-hover: #B59329; /* Dorado ligeramente más oscuro para botones presionados */
+  --borde: #E8DFD5; /* Líneas divisorias muy suaves */
+  --sobre: #FFFFFF; /* Letra blanca sobre botones dorados */
+  --alerta: #D9534F; /* Rojo suave para alertas (eliminar testimonios) */
 }
+
+/* Forzamos el color de fondo general al nuevo tono cálido */
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -31,11 +31,11 @@
 * { box-sizing: border-box; }
 
 body {
+  background-color: var(--fondo);
+  color: var(--texto);
   margin: 0 auto;
   max-width: 640px;
   padding: 0 20px calc(176px + env(safe-area-inset-bottom, 0px));
-  background: var(--fondo);
-  color: var(--texto);
   font: 400 1.2rem/1.6 "Atkinson Hyperlegible", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -51,21 +51,39 @@ p { margin: 0 0 14px; }
 /* HEADER REDISEÑADO (Estilo App Móvil: Horizontal y Sutil) */
 /* ========================================================= */
 header {
+  position: relative; 
   display: flex;
-  flex-direction: row; /* Coloca el logo y el texto lado a lado */
+  justify-content: center; 
   align-items: center;
-  justify-content: center; /* Mantiene el conjunto centrado en la pantalla */
-  gap: 16px; /* Separación entre el escudo y las letras */
-  padding: 16px 20px; /* Relleno reducido para no abarcar tanta pantalla */
+  padding: 20px 70px; /* Margen amplio a los lados para la flecha y el logo */
   background: var(--fondo);
   border-bottom: 1px solid var(--borde);
+  text-align: center;
 }
-/*-------------------------------------------------------------HEADER------------------------------------------*/
-/* Reducimos el logo para que sea un ícono de acompañamiento */
-header img { 
-  width: 54px; 
-  height: 54px; 
-  flex-shrink: 0; 
+
+.header-texto h1 {
+  font-size: 1.4rem;
+  color: var(--texto);
+  margin: 0 0 4px 0;
+  font-family: 'Cinzel', serif; /* Conserva la elegancia del título */
+}
+
+.header-texto p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  line-height: 1.35;
+}
+
+/* Fija el logo exactamente en la esquina superior derecha */
+header img {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%); /* Lo centra verticalmente de forma automática */
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
 }
 
 /* El bloque de texto se alinea a la izquierda del logo */
@@ -407,3 +425,29 @@ input[type=checkbox]:checked::after {
   stroke-linejoin: round;
   fill: none;
 }
+/* Transición suave al cambiar de pantallas */
+.pantalla {
+  display: none;
+  opacity: 0;
+  animation: aparecerSuave 0.4s ease forwards;
+}
+.pantalla.activa {
+  display: block;
+}
+
+@keyframes aparecerSuave {
+  from { opacity: 0; transform: translateY(8px); } /* Sube muy sutilmente */
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==============================================
+   REEMPLAZO DE ZOOM EN BOTONES
+   ============================================== */
+/* Busca tu clase actual de .btn-regresar:hover y .principal:hover, 
+   y borra el "transform: scale(1.05);" reemplazándolo por esto: */
+
+.btn-regresar:hover, .principal:hover, .secundario:hover {
+  transform: translateY(-2px); /* Se levanta un milímetro, da sensación de botón presionado */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Sombra elegante, no invasiva */
+}
+
