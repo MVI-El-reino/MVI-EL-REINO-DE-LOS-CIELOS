@@ -80,6 +80,7 @@ $('formulario').addEventListener('submit', async (e) => {
         telefono: $('telefono').value,
         web: $('web').value,
         muro: solicitaMuro 
+        acepto: true
       }),
     });
     
