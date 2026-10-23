@@ -5,22 +5,19 @@ const CONFIG = {
   DB: 'https://peticiones-mvi-default-rtdb.firebaseio.com',
 };
 
-// Utilidad para selección rápida del DOM (Simulando jQuery de forma nativa)
+// Utilidad para selección rápida del DOM
 const $ = (id) => document.getElementById(id);
 
-let tema = '';
-let ultimo = null;
+let ultimo = null; // Eliminamos la variable "tema" global porque ahora usamos un menú desplegable directo
 
 /**
- * Función central de navegación entre pantallas (Single Page Application - SPA).
- * Oculta todas las secciones y muestra solo la que coincida con el ID proporcionado.
+ * Función central de navegación entre pantallas (SPA)
  */
 function mostrar(id) {
   document.querySelectorAll('.pantalla').forEach((s) => s.classList.toggle('activa', s.id === id));
   window.scrollTo(0, 0);
   
   if (id === 'mis') listarMis();
-  //Si entra al muro, ejecuta la función de carga
   if (id === 'muro') cargarMuro(); 
   if (id === 'testimonios') cargarTestimonios();
 }
@@ -33,33 +30,13 @@ document.querySelectorAll('[data-ir]').forEach((el) =>
   })
 );
 
-/**
- * Genera dinámicamente el enlace de WhatsApp (API de click-to-chat).
- * Si existe un código de petición, lo inyecta para dar contexto al pastor.
- */
 function ayudaUrl(codigo) {
   const txt = codigo ? `Hola, necesito ayuda. Mi código de petición es ${codigo}.` : 'Hola, necesito ayuda espiritual.';
   return `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(txt)}`;
 }
 
-// Asignación inicial de enlaces fijos en la barra inferior (Sticky Footer)
-$('btnAyuda').href = ayudaUrl('');$('btnLlamar').href = `tel:${CONFIG.TELEFONO}`;
-
-/**
- * Manejo visual (UI) de la selección de "Temas" en el formulario.
- * Utiliza atributos ARIA para accesibilidad en lectores de pantalla.
- */
-function marcarTemas() {
-  document.querySelectorAll('#temas button').forEach((b) => 
-    b.setAttribute('aria-pressed', String(b.dataset.tema === tema))
-  );
-}
-
-// Toggle (activar/desactivar) selección exclusiva de temas
-document.querySelectorAll('#temas button').forEach((b) => b.addEventListener('click', () => {
-  tema = tema === b.dataset.tema ? '' : b.dataset.tema;
-  marcarTemas();
-}));
+$('btnAyuda').href = ayudaUrl('');
+$('btnLlamar').href = `tel:${CONFIG.TELEFONO}`;
 
 // Lógica condicional: Ocultar bloque de "Nombre" si selecciona "Anónimo"
 const anonimo = () => document.querySelector('input[name=anonimo]:checked').value === 'si';
@@ -75,12 +52,20 @@ document.querySelectorAll('input[name=anonimo]').forEach((r) =>
 $('formulario').addEventListener('submit', async (e) => {
   e.preventDefault();
   
-  // Reseteo visual de errores y bloqueo de botón para evitar múltiples envíos (Double submit)
-  $('error').textContent = '';$('enviar').disabled = true;
+  // Reseteo visual de errores y bloqueo de botón
+  $('error').textContent = '';
+  $('enviar').disabled = true;
 
   try {
-    // NUEVA LÓGICA: Verificar si el usuario solicita publicación pública
-    const solicitaMuro = $('solicitaMuro') ?$('solicitaMuro').checked : false;
+    // 1. Leer el nuevo menú desplegable de Motivo (Tema)
+    const temaSeleccionado = $('tema').value;
+
+    // 2. Leer la Privacidad (Radio buttons en lugar de checkbox)
+    const privacidadSeleccionada = document.querySelector('input[name="privacidad"]:checked').value;
+    const solicitaMuro = (privacidadSeleccionada === 'publica'); 
+    
+    // 3. Evaluar el anonimato
+    const esAnonimo = anonimo();
 
     // Petición asíncrona hacia el Endpoint del Backend (/api/peticion.js)
     const r = await fetch('/api/peticion', {
@@ -88,12 +73,12 @@ $('formulario').addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         texto: $('texto').value, 
-        categoria: tema, 
-        anonimo: anonimo(),
-        nombre: $('nombre').value, 
+        categoria: temaSeleccionado, 
+        anonimo: esAnonimo,
+        // Si es anónimo, sobreescribimos el texto para que a Firebase nunca llegue el nombre
+        nombre: esAnonimo ? "Anónimo" : $('nombre').value, 
         telefono: $('telefono').value,
-        web: $('web').value, // Honeypot antispam: si viene lleno, es un bot
-        acepto: $('acepto').checked,
+        web: $('web').value, // Honeypot antispam
         muro: solicitaMuro // Bandera para que el Pastor decida publicarla o no
       }),
     });
@@ -101,31 +86,33 @@ $('formulario').addEventListener('submit', async (e) => {
     const j = await r.json();
     if (!r.ok) throw new Error(j.error || 'Falla de conexión con el servidor. Intente nuevamente.');
     
-    ultimo = j; // Almacenamiento en caché de memoria para acciones posteriores (Copiar, TTS)
+    ultimo = j; 
     
-    // Inyección de la respuesta de la base de datos en el DOM (Pantalla de Éxito)
+    // Inyección de la respuesta de la base de datos en el DOM
     $('codigoTxt').textContent = j.codigo;
     $('citaTxt').textContent = j.versiculo.cita;
     $('versoTxt').textContent = j.versiculo.texto;
-    $('btnAyuda').href = ayudaUrl(j.codigo); // Actualiza el WhatsApp con el código
+    $('btnAyuda').href = ayudaUrl(j.codigo); 
     
-    // Persistencia local para el seguimiento del usuario
     guardarMis(j.codigo);
     
     // Limpieza de estados del formulario
     e.target.reset();
-    tema = '';
-    marcarTemas();
     $('bloqueNombre').style.display = 'block';
     
-    mostrar('resultado'); // Transición a pantalla de éxito
+    mostrar('resultado'); 
 
   } catch (err) {
     $('error').textContent = err.message;
   } finally {
-    $('enviar').disabled = false; // Restaurar interactividad
+    $('enviar').disabled = false; 
   }
 });
+
+// =====================================================================
+// DE AQUÍ EN ADELANTE TU CÓDIGO SE QUEDA EXACTAMENTE IGUAL
+// (TTS, Portapapeles, Compartir, guardarMis, listarMis, cargarMuro, etc.)
+// =====================================================================
 
 /**
  * Text-to-Speech (TTS) usando Web Speech API nativa.
