@@ -1,16 +1,18 @@
 :root {
-  --fondo: #FAF6F0; /* Color hueso cálido y relajante (amigable a la vista) */
-  --superficie: #FFFFFF; /* Blanco puro para las tarjetas, genera contraste claro */
-  --texto: #2C2420; /* Marrón muy oscuro, casi negro, ideal para adultos mayores */
-  --texto-suave: #73655D; /* Gris cálido para textos secundarios */
-  --acento: #D4AF37; /* Dorado clásico que hace juego con tu logo */
-  --acento-hover: #B59329; /* Dorado ligeramente más oscuro para botones presionados */
-  --borde: #E8DFD5; /* Líneas divisorias muy suaves */
-  --sobre: #FFFFFF; /* Letra blanca sobre botones dorados */
-  --alerta: #D9534F; /* Rojo suave para alertas (eliminar testimonios) */
+  --fondo: #FAF6F0; /* Fondo hueso elegante */
+  --superficie: #FFFFFF; 
+  /* Azul Oxford muy oscuro para textos, más suave que el negro puro */
+  --texto: #1B242C; 
+  --texto-suave: #566573; 
+  --acento: #D4AF37; /* El dorado de tu logo */
+  
+  /* NUEVO: Azul Oxford / Metálico para botones */
+  --oxford-metalico: linear-gradient(135deg, #34495E 0%, #1C2833 100%);
+  --oxford-hover: linear-gradient(135deg, #405973 0%, #273746 100%);
+  
+  --borde: #E5DDD3;
+  --sobre: #FFFFFF; 
 }
-
-/* Forzamos el color de fondo general al nuevo tono cálido */
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -153,27 +155,78 @@ button:disabled {
   transform: none;
 }
 
-.principal {
-  background: var(--acento);
-  border-color: var(--acento);
-  color: var(--sobre);
-  box-shadow: var(--sombra-app); /* Elevación fuerte para el Call to Action (CTA) */
+/* Centra el contenedor de los botones */
+nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra los botones horizontalmente */
+  gap: 14px; /* Separación elegante entre botones */
+  width: 100%;
+  margin-top: 20px;
 }
 
-.principal:hover { background: #E0BC4A; }
-.secundario { min-height: 54px; font-weight: 400; font-size: 1.05rem; }
-
-/* Menú principal convertido de listas planas a bloques clicables */
+/* Estilo base para todos los botones del menú (Los blancos) */
 .fila {
-  justify-content: flex-start;
-  text-align: left;
-  min-height: 72px;
-  margin: 8px 0;
-  padding: 16px;
+  width: 100%;
+  max-width: 380px; /* Evita que el botón se estire feo en pantallas grandes */
+  display: flex;
+  justify-content: center; /* Centra el texto del botón */
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--superficie);
+  color: var(--texto);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
   border: 1px solid var(--borde);
   border-radius: 12px;
-  font-size: 1.2rem;
-  font-weight: 400;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03); /* Sombra casi invisible para dar volumen */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Efecto al pasar el dedo/mouse sobre los botones blancos */
+.fila:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--acento); /* Se pinta el borde de dorado sutilmente */
+  color: var(--acento);
+}
+
+/* Centra los textos descriptivos de cada pantalla */
+section > p {
+  text-align: center;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--texto-suave);
+  max-width: 500px;
+  margin: 0 auto 24px auto; /* Lo centra en la pantalla */
+}
+
+/* Estilo para los botones destacados (Muro de peticiones, Enviar, Ayuda) */
+.principal {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--oxford-metalico); /* El tono Azul Oxford Brilloso */
+  color: var(--sobre);
+  font-size: 1rem;
+  font-weight: 700; /* Letra un poco más gruesa */
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Brillo metálico superior */
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(28, 40, 51, 0.4); /* Sombra color oxford para mayor realismo */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.principal:hover {
+  background: var(--oxford-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(28, 40, 51, 0.5);
 }
 
 :focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; }
