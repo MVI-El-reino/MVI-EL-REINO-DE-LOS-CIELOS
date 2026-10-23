@@ -52,15 +52,15 @@ document.querySelectorAll('input[name=anonimo]').forEach((r) =>
 $('formulario').addEventListener('submit', async (e) => {
   e.preventDefault();
   
-  // Reseteo visual de errores y bloqueo de botón
-  $('error').textContent = '';
+  // Reseteo visual de errores con "?" protector (Evita que la app choque si no encuentra la etiqueta)
+  if($('error')) $('error').textContent = '';
   $('enviar').disabled = true;
 
   try {
     // 1. Leer el nuevo menú desplegable de Motivo (Tema)
     const temaSeleccionado = $('tema').value;
 
-    // 2. Leer la Privacidad (Radio buttons en lugar de checkbox)
+    // 2. Leer la Privacidad 
     const privacidadSeleccionada = document.querySelector('input[name="privacidad"]:checked').value;
     const solicitaMuro = (privacidadSeleccionada === 'publica'); 
     
@@ -75,11 +75,10 @@ $('formulario').addEventListener('submit', async (e) => {
         texto: $('texto').value, 
         categoria: temaSeleccionado, 
         anonimo: esAnonimo,
-        // Si es anónimo, sobreescribimos el texto para que a Firebase nunca llegue el nombre
         nombre: esAnonimo ? "Anónimo" : $('nombre').value, 
         telefono: $('telefono').value,
-        web: $('web').value, // Honeypot antispam
-        muro: solicitaMuro // Bandera para que el Pastor decida publicarla o no
+        web: $('web').value,
+        muro: solicitaMuro 
       }),
     });
     
@@ -96,14 +95,13 @@ $('formulario').addEventListener('submit', async (e) => {
     
     guardarMis(j.codigo);
     
-    // Limpieza de estados del formulario
     e.target.reset();
     $('bloqueNombre').style.display = 'block';
     
     mostrar('resultado'); 
 
   } catch (err) {
-    $('error').textContent = err.message;
+    if($('error')) $('error').textContent = err.message;
   } finally {
     $('enviar').disabled = false; 
   }
