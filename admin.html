@@ -151,25 +151,63 @@ function tarjetaTestimonio(t) {
 }
 
 // TARJETA DE PETICIONES ORIGINAL
+// TARJETA DE PETICIONES ACTUALIZADA
 function tarjetaPeticion(p) {
   const fila = el('article', undefined, 'fila-admin');
-  let badgeMuro = p.solicitaMuro ? ' 📌 (Pidió Muro)' : '';
   
-  fila.append(
-    el('small', `${new Date(p.fecha).toLocaleString('es-MX')}. Código ${p.codigo}. Tema: ${p.categoria || 'sin tema'}.${badgeMuro}`),
-    el('h3', p.nombre || 'Anónimo'),
-    el('p', p.texto),
-    el('p', `Versículo asignado: ${p.versiculo?.cita || 'ninguno'}`)
-  );
+  // 1. Detectar si la petición es pública o privada (soporta el código nuevo y viejo)
+  const quiereMuro = p.muro === true || p.solicitaMuro === true;
+  
+  // 2. Crear el encabezado con las etiquetas visuales
+  const headerTop = el('div');
+  headerTop.style.display = 'flex';
+  headerTop.style.justifyContent = 'space-between';
+  headerTop.style.marginBottom = '12px';
 
+  const badgePrivacidad = el('span', quiereMuro ? 'PÚBLICA (Muro)' : 'PRIVADA (Solo equipo)');
+  badgePrivacidad.style.padding = '4px 10px';
+  badgePrivacidad.style.borderRadius = '12px';
+  badgePrivacidad.style.fontSize = '0.75rem';
+  badgePrivacidad.style.fontWeight = 'bold';
+  badgePrivacidad.style.color = 'white';
+  badgePrivacidad.style.backgroundColor = quiereMuro ? 'var(--acento, #D4AF37)' : 'var(--texto-suave, #566573)';
+
+  const fechaBadge = el('span', `${new Date(p.fecha).toLocaleString('es-MX')} | Cód: ${p.codigo}`);
+  fechaBadge.style.color = 'var(--texto-suave, #73655D)';
+  fechaBadge.style.fontSize = '0.8rem';
+
+  headerTop.append(badgePrivacidad, fechaBadge);
+
+  // 3. Etiqueta del Motivo de oración
+  const motivo = el('div', `Motivo: ${p.categoria || 'Sin especificar'}`);
+  motivo.style.color = 'var(--texto, #1B242C)';
+  motivo.style.fontWeight = 'bold';
+  motivo.style.fontSize = '0.85rem';
+  motivo.style.marginBottom = '8px';
+
+  // 4. Armar el cuerpo de la tarjeta
+  const titulo = el('h3', p.nombre || 'Anónimo');
+  titulo.style.marginTop = '0';
+  const texto = el('p', p.texto);
+  const versiculo = el('p', `Versículo asignado: ${p.versiculo?.cita || 'ninguno'}`);
+  versiculo.style.fontStyle = 'italic';
+  versiculo.style.fontSize = '0.9rem';
+  versiculo.style.color = 'var(--texto-suave, #566573)';
+
+  fila.append(headerTop, motivo, titulo, texto, versiculo);
+
+  // 5. Botón de llamada (si dejó teléfono)
   if (p.telefono) {
     const a = el('a', `Llamar a ${p.telefono}`);
     a.href = `tel:${p.telefono}`;
-    a.style.display = 'block';
-    a.style.marginBottom = '10px';
+    a.style.display = 'inline-block';
+    a.style.marginBottom = '15px';
+    a.style.fontWeight = 'bold';
+    a.style.color = 'var(--acento, #D4AF37)';
     fila.append(a);
   }
 
+  // 6. Controles de Estado (Contestada / Sin contestar)
   const botonesEstado = el('div', undefined, 'estados');
   for (const op of ['no contestada', 'contestada']) {
     const b = el('button', op === 'contestada' ? 'Contestada 🙏' : 'Sin contestar', op === p.estado ? 'activo' : '');
@@ -179,39 +217,48 @@ function tarjetaPeticion(p) {
         [`peticiones/${p.id}/estado`]: op,
         [`codigos/${p.codigo}/estado`]: op,
       };
-      if (p.visibilidad === 'publicada') updates[`muro/${p.id}/estado`] = op;
-      update(ref(db), updates).catch((err) => alert('No se pudo guardar: ' + err.message));
+      // Solo actualiza el estado en el muro si actualmente está visible ahí
+      if (p.visibilidad === 'publicada') updates[`muro/${p.id}/estado`] = op;[cite: 10]
+      update(ref(db), updates).catch((err) => alert('No se pudo guardar: ' + err.message));[cite: 10]
     };
     botonesEstado.append(b);
   }
 
-  const btnMuro = el('button', p.visibilidad === 'publicada' ? 'Quitar del Muro Público' : 'Publicar en Muro Público');
-  if (p.visibilidad === 'publicada') btnMuro.className = 'secundario';
-  else if (p.solicitaMuro) btnMuro.className = 'principal';
+  // 7. Botón del Muro Público
+  const btnMuro = el('button', p.visibilidad === 'publicada' ? 'Quitar del Muro Público' : 'Publicar en Muro Público');[cite: 10]
+  if (p.visibilidad === 'publicada') {
+    btnMuro.className = 'secundario';[cite: 10]
+  } else if (quiereMuro) {
+    btnMuro.className = 'principal'; // Botón destacado si el usuario lo pidió
+  } else {
+    btnMuro.className = 'secundario';
+    btnMuro.style.opacity = '0.6'; // Botón opaco si es privada, para evitar publicarla por accidente
+  }
   
   btnMuro.onclick = () => {
-    if (p.visibilidad !== 'publicada') {
-      if (!confirm('¿Seguro de publicar en el Muro Web?')) return;
+    if (p.visibilidad !== 'publicada') {[cite: 10]
+      if (!quiereMuro && !confirm('ATENCIÓN: El usuario pidió que esta petición sea PRIVADA. ¿Seguro que deseas publicarla en el Muro Web?')) return;
+      if (quiereMuro && !confirm('¿Seguro de publicar en el Muro Web?')) return;[cite: 10]
+      
       update(ref(db), {
-        [`peticiones/${p.id}/visibilidad`]: 'publicada',
-        [`muro/${p.id}`]: { texto: p.texto, nombre: p.nombre, anonimo: p.anonimo, fecha: p.fecha, versiculo: p.versiculo, estado: p.estado }
-      }).catch((err) => alert('Error: ' + err.message));
+        [`peticiones/${p.id}/visibilidad`]: 'publicada',[cite: 10]
+        [`muro/${p.id}`]: { texto: p.texto, nombre: p.nombre, anonimo: p.anonimo, fecha: p.fecha, versiculo: p.versiculo, estado: p.estado }[cite: 10]
+      }).catch((err) => alert('Error: ' + err.message));[cite: 10]
     } else {
       update(ref(db), {
-        [`peticiones/${p.id}/visibilidad`]: 'privada',
-        [`muro/${p.id}`]: null
-      }).catch((err) => alert('Error: ' + err.message));
+        [`peticiones/${p.id}/visibilidad`]: 'privada',[cite: 10]
+        [`muro/${p.id}`]: null[cite: 10]
+      }).catch((err) => alert('Error: ' + err.message));[cite: 10]
     }
   };
 
-  const notas = el('textarea');
-  notas.value = p.notas || '';
-  notas.placeholder = 'Notas pastorales...';
-  notas.onchange = () => update(ref(db, `peticiones/${p.id}`), { notas: notas.value });
+  // 8. Notas Pastorales
+  const notas = el('textarea');[cite: 10]
+  notas.value = p.notas || '';[cite: 10]
+  notas.placeholder = 'Notas pastorales... (Ocultas al público)';[cite: 10]
+  notas.style.marginTop = '10px';
+  notas.onchange = () => update(ref(db, `peticiones/${p.id}`), { notas: notas.value });[cite: 10]
   
-  fila.append(botonesEstado, btnMuro, notas);
-  return fila;
+  fila.append(botonesEstado, btnMuro, notas);[cite: 10]
+  return fila;[cite: 10]
 }
-</script>
-</body>
-</html>
