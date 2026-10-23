@@ -18,10 +18,16 @@
 </head>
 <body>
 <header>
+  <!-- El único botón de regresar en todo el documento -->
+  <button class="btn-regresar" data-ir="inicio" type="button" aria-label="Volver al inicio">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  </button>
+
   <div class="header-texto">
     <h1>Trono de su gracia</h1>
-    <p>Mutuo acuerdo<br>MVI El Reino de los Cielos</p>
+    <p>Unidos en Mutuo acuerdo -<br>MVI El Reino de los Cielos</p>
   </div>
+  
   <img src="/icons/icon-192.png" alt="Escudo de MVI El Reino de los Cielos">
 </header>
 <main>
@@ -83,44 +89,59 @@
 <section id="pedir" class="pantalla">
   <h2>Escriba su petición</h2>
   <form id="formulario">
-    <label for="texto">Cuéntenos lo que necesita. Puede dictarlo con el micrófono del teclado.</label>
-    <textarea id="texto" maxlength="800" required></textarea>
+    
+    <!-- 1. LA PETICIÓN -->
+    <label for="texto">Tu petición:</label>
+    <p style="font-size: 0.8rem; color: var(--texto-suave); margin-top: -8px; margin-bottom: 8px;">Puedes dictarla usando el micrófono de tu teclado.</p>
+    <textarea id="texto" maxlength="800" placeholder="Señor, te pido por..." required></textarea>
 
-    <p class="etiqueta">Tema (opcional)</p>
-    <div class="temas" id="temas">
-      <button type="button" data-tema="salud" aria-pressed="false">Salud</button>
-      <button type="button" data-tema="miedo" aria-pressed="false">Miedo o preocupación</button>
-      <button type="button" data-tema="duelo" aria-pressed="false">Duelo</button>
-      <button type="button" data-tema="familia" aria-pressed="false">Familia</button>
-      <button type="button" data-tema="trabajo" aria-pressed="false">Trabajo o dinero</button>
-      <button type="button" data-tema="decisiones" aria-pressed="false">Decisiones</button>
-      <button type="button" data-tema="gratitud" aria-pressed="false">Dar gracias</button>
-    </div>
+    <!-- 2. MOTIVO (Menú desplegable) -->
+    <label for="tema">Motivo de oración:</label>
+    <select id="tema" required>
+      <option value="" disabled selected>Selecciona una categoría...</option>
+      <option value="Salud">Salud / Sanidad</option>
+      <option value="Finanzas">Finanzas / Provisión</option>
+      <option value="Matrimonio/Familia">Matrimonio / Familia</option>
+      <option value="Ministerio">Ministerio / Propósito</option>
+      <option value="Gratitud">Acción de Gracias</option>
+      <option value="Otro">Otro</option>
+    </select>
 
-    <p class="etiqueta">¿Quiere poner su nombre?</p>
-    <label class="opcion"><input type="radio" name="anonimo" value="no" checked> Sí, con mi nombre</label>
-    <label class="opcion"><input type="radio" name="anonimo" value="si"> No, prefiero ser anónimo</label>
+    <!-- 3. NIVEL DE PRIVACIDAD -->
+    <p class="etiqueta">Nivel de privacidad:</p>
+    <label class="opcion">
+      <input type="radio" name="privacidad" value="publica" id="solicitaMuro" checked> 
+      <strong>Pública</strong> (Para que toda la iglesia ore en el Muro)
+    </label>
+    <label class="opcion">
+      <input type="radio" name="privacidad" value="privada"> 
+      <strong>Privada</strong> (Solo para el equipo pastoral y de intercesión)
+    </label>
+
+    <!-- 4. IDENTIDAD Y ANONIMATO -->
+    <p class="etiqueta" style="margin-top: 20px;">Identidad:</p>
+    <label class="opcion">
+      <input type="radio" name="anonimo" value="no" checked> 
+      Compartir mi nombre
+    </label>
+    <label class="opcion">
+      <input type="radio" name="anonimo" value="si"> 
+      Prefiero mantener esta petición anónima
+    </label>
     <div id="bloqueNombre">
-      <label for="nombre">Su nombre</label>
-      <input id="nombre" type="text" maxlength="60" autocomplete="name">
+      <input id="nombre" type="text" maxlength="60" autocomplete="name" placeholder="Escribe tu nombre">
     </div>
 
-    <label for="telefono">Su celular, si quiere que el pastor le CONTACTE (opcional)</label>
-    <input id="telefono" type="tel" inputmode="tel" maxlength="15" autocomplete="tel">
+    <!-- 5. CONTACTO -->
+    <label for="telefono" style="margin-top: 15px;">Contacto (Opcional):</label>
+    <p style="font-size: 0.8rem; color: var(--texto-suave); margin-top: -8px; margin-bottom: 8px;">Si deseas que un líder o pastor te contacte para orar contigo, deja tu número de WhatsApp.</p>
+    <input id="telefono" type="tel" inputmode="tel" maxlength="15" autocomplete="tel" placeholder="Ej. 271 123 4567">
 
+    <!-- Campo trampa Anti-Bots -->
     <div class="oculto" aria-hidden="true"><label>No llene este campo <input id="web" tabindex="-1" autocomplete="off"></label></div>
 
-    <label class="opcion"><input type="checkbox" id="acepto"> Acepto que solo el pastor y el equipo de oración lean mi petición. Leí el <a href="#" data-ir="aviso">aviso de privacidad</a>.</label>
-
-    <p id="error" class="error" role="alert"></p>
-
-    <!-- Checkbox para el Muro de Peticiones -->
-<label class="opcion">
-  <input type="checkbox" id="solicitaMuro"> 
-  Deseo que esta petición se publique en el Muro de la Iglesia para que la congregación ore por mí (Su petición será revisada antes de publicarse).
-</label>
-    
-    <button class="principal" id="enviar" type="submit">Enviar petición</button>
+    <!-- Botón Final -->
+    <button class="principal" id="enviar" type="submit" style="margin-top: 25px; width: 100%; max-width: 100%;">Enviar petición</button>
   </form>
 </section>
 
