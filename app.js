@@ -79,7 +79,7 @@ $('formulario').addEventListener('submit', async (e) => {
         nombre: esAnonimo ? "Anónimo" : $('nombre').value, 
         telefono: $('telefono').value,
         web: $('web').value,
-        muro: solicitaMuro 
+        muro: solicitaMuro, 
         acepto: true
       }),
     });
