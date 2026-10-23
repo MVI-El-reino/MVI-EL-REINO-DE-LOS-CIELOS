@@ -35,8 +35,9 @@ function ayudaUrl(codigo) {
   return `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(txt)}`;
 }
 
-$('btnAyuda').href = ayudaUrl('');
-$('btnLlamar').href = `tel:${CONFIG.TELEFONO}`;
+// NUEVA VERSIÓN A PRUEBA DE ERRORES:
+if ($('btnAyuda')) $('btnAyuda').href = ayudaUrl('');
+if ($('btnLlamar')) $('btnLlamar').href = `tel:${CONFIG.TELEFONO}`;
 
 // Lógica condicional: Ocultar bloque de "Nombre" si selecciona "Anónimo"
 const anonimo = () => document.querySelector('input[name=anonimo]:checked').value === 'si';
@@ -91,7 +92,7 @@ $('formulario').addEventListener('submit', async (e) => {
     $('codigoTxt').textContent = j.codigo;
     $('citaTxt').textContent = j.versiculo.cita;
     $('versoTxt').textContent = j.versiculo.texto;
-    $('btnAyuda').href = ayudaUrl(j.codigo); 
+    if ($('btnAyuda')) $('btnAyuda').href = ayudaUrl(j.codigo);
     
     guardarMis(j.codigo);
     
