@@ -63,6 +63,41 @@ header {
   text-align: center;
 }
 
+/* =========================================
+   CORRECCIÓN DE CENTRADO (Eslogan y Botones)
+   ========================================= */
+
+/* 1. Fuerza al texto del eslogan a estar perfectamente centrado */
+.header-texto {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-texto h1, 
+.header-texto p {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 2. Centra los botones sueltos (como el de "Necesito ayuda") en cualquier pantalla */
+.principal, 
+.fila, 
+.secundario {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Si el botón de ayuda es un enlace (<a>), aseguramos que respete el centrado */
+a.principal, 
+a.fila, 
+a.secundario {
+  display: flex !important;
+}
+
 .header-texto h1 {
   font-size: 1.4rem;
   color: var(--texto);
