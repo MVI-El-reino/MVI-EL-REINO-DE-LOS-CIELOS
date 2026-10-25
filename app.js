@@ -1,6 +1,6 @@
 const CONFIG = {
   // NOTA: Configura con el código de país (52) y el número a 10 dígitos. Sin el "1" intermedio.
-  WHATSAPP: '52XXXXXXXXXX', 
+  WHATSAPP: '522711330016', 
   TELEFONO: '+52271XXXXXXX', 
   DB: 'https://peticiones-mvi-default-rtdb.firebaseio.com',
 };
