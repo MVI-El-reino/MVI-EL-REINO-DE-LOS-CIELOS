@@ -579,5 +579,54 @@ header { position: relative; }
 .respondida { margin: 14px 0; padding: 16px; border: 1px solid var(--acento); border-radius: 8px; }  /* Cuadro de "Dios ya respondió" */
 .respondida p { margin: 0 0 12px; }
 
+/* =========================================
+   PLACAS DE LIDERAZGO PASTORAL
+   ========================================= */
+.contenedor-pastores {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Divide el espacio en dos columnas exactamente iguales */
+  gap: 15px; /* Separación elegante entre ambas placas */
+  width: 100%;
+  margin-bottom: 10px;
+}
 
+.placa-pastor {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(27, 36, 44, 0.05); /* Sombra muy sutil */
+}
+
+/* Diseño de las fotografías en círculo */
+.foto-pastor {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%; /* Convierte la foto en un círculo perfecto */
+  object-fit: cover; /* Evita que la foto se deforme o apachurre */
+  border: 2px solid var(--acento); /* Anillo dorado alrededor de la foto */
+  margin-bottom: 12px;
+  padding: 2px; /* Pequeño espacio blanco entre la foto y el anillo dorado */
+  background: var(--superficie);
+}
+
+.placa-pastor h4 {
+  font-size: 0.7rem;
+  color: var(--texto-suave);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 4px 0 !important;
+}
+
+.placa-pastor p {
+  font-size: 0.95rem;
+  color: var(--texto);
+  font-weight: 700;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+}
 
