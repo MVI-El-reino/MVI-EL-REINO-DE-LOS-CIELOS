@@ -631,6 +631,50 @@ header { position: relative; }
 }
 
 /* =========================================
+   HORARIOS DE REUNIÓN
+   ========================================= */
+.contenedor-horarios {
+  display: flex;
+  gap: 15px; /* Separación simétrica entre los dos cuadros */
+  margin-bottom: 25px; /* Espacio antes de la sección de ubicación */
+  width: 100%;
+}
+
+.tarjeta-horario {
+  flex: 1; /* Hace que ambas tarjetas midan exactamente lo mismo */
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 16px 10px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(27, 36, 44, 0.05); /* Sombra elegante casi invisible */
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+/* Efecto sutil al pasar el dedo/mouse */
+.tarjeta-horario:hover {
+  transform: translateY(-2px);
+  border-color: var(--acento); /* El borde se pinta de dorado */
+}
+
+.tarjeta-horario .dia {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+.tarjeta-horario .hora {
+  display: block;
+  font-size: 1.35rem;
+  color: var(--texto); /* Tono principal oscuro para máxima legibilidad */
+  font-weight: 800;
+}
+
+/* =========================================
    ACORDEÓN DE AVISO DE PRIVACIDAD
    ========================================= */
 .acordeon-privacidad {
