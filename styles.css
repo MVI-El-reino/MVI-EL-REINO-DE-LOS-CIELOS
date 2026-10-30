@@ -630,3 +630,74 @@ header { position: relative; }
   line-height: 1.2 !important;
 }
 
+/* =========================================
+   ACORDEÓN DE AVISO DE PRIVACIDAD
+   ========================================= */
+.acordeon-privacidad {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.acordeon-privacidad details {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Efecto cuando la caja está abierta */
+.acordeon-privacidad details[open] {
+  box-shadow: 0 4px 12px rgba(27, 36, 44, 0.08);
+  border-color: var(--acento);
+}
+
+.acordeon-privacidad summary {
+  padding: 16px 20px;
+  font-weight: 700;
+  color: var(--texto);
+  cursor: pointer;
+  list-style: none; /* Oculta la flecha nativa fea */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+/* Ocultar flecha en Safari */
+.acordeon-privacidad summary::-webkit-details-marker {
+  display: none; 
+}
+
+/* Crear nuestro propio ícono elegante (+) */
+.acordeon-privacidad summary::after {
+  content: '+';
+  font-size: 1.5rem;
+  color: var(--acento);
+  font-weight: 400;
+  line-height: 1;
+  margin-left: 10px;
+}
+
+/* Cambiar a (-) cuando está abierto */
+.acordeon-privacidad details[open] summary::after {
+  content: '−';
+}
+
+.contenido-acordeon {
+  padding: 0 20px 20px 20px;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.contenido-acordeon ul, .contenido-acordeon ol {
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+.contenido-acordeon li {
+  margin-bottom: 6px;
+}
