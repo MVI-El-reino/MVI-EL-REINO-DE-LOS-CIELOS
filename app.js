@@ -29,13 +29,23 @@ const el = (tag, texto, clase) => {
 };
 
 // 2. NAVEGACIÓN ENTRE PANTALLAS
+/**
+ * Función central de navegación entre pantallas (SPA)
+ */
 function mostrar(id) {
   document.querySelectorAll('.pantalla').forEach((s) => s.classList.toggle('activa', s.id === id));
   window.scrollTo(0, 0);
-  // Cada pantalla carga sus datos al abrirse
+  
   if (id === 'mis') listarMis();
-  if (id === 'muro') cargarMuro();
+  if (id === 'muro') cargarMuro(); 
   if (id === 'testimonios') cargarTestimonios();
+
+  // NUEVO: Mostrar aviso de privacidad la primera vez que entra a "Pedir Oración"
+  if (id === 'pedir') {
+    if (!localStorage.getItem('avisoPrivacidadVisto')) {
+      $('modal-privacidad').style.display = 'flex';
+    }
+  }
 }
 document.querySelectorAll('[data-ir]').forEach((b) =>
   b.addEventListener('click', (e) => { e.preventDefault(); mostrar(b.dataset.ir); })
@@ -344,3 +354,18 @@ $('formTestimonio').addEventListener('submit', async (e) => {
     $('btnEnviarTestimonio').disabled = false;
   }
 });
+
+// =========================================
+// LÓGICA DEL MODAL DE PRIVACIDAD
+// =========================================
+function cerrarModalPrivacidad() {
+  if ($('modal-privacidad')) {
+    $('modal-privacidad').style.display = 'none';
+    // Guarda en la memoria del navegador que el usuario ya vio el aviso
+    localStorage.setItem('avisoPrivacidadVisto', 'true');
+  }
+}
+
+// Conectar la "X" y el botón "Entendido"
+if ($('btn-cerrar-modal')) $('btn-cerrar-modal').addEventListener('click', cerrarModalPrivacidad);
+if ($('btn-entendido-modal')) $('btn-entendido-modal').addEventListener('click', cerrarModalPrivacidad);
