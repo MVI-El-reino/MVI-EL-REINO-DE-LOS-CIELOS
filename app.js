@@ -284,7 +284,7 @@ async function cargarMuro() {
         el('small', new Date(p.fecha).toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })),
         el('h3', p.anonimo ? 'Petición anónima' : (p.nombre || 'Petición anónima')),
         el('p', `"${p.texto}"`),
-        el('p', `Dios prometió: ${p.versiculo?.cita || ''}`, 'nota'),
+        el('p', `Versiculo para acompañarte: ${p.versiculo?.cita || ''}`, 'nota'),
       );
       return card;
     }));
