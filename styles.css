@@ -496,25 +496,28 @@ input[type=checkbox]:checked::after {
 .fijo .ayuda { min-height: 68px; margin: 0; font-size: 1.25rem; }
 .fijo .llamar { min-height: 50px; margin: 0; font-size: 1rem; font-weight: 400; }
 
-/* Botón de retroceso circular FIJO en la esquina superior derecha */
-/* Botón clavado en la pantalla permanentemente */
+/* =========================================
+   BOTÓN DE REGRESO FLOTANTE (Estilo App)
+   ========================================= */
 .btn-regresar {
-  position: fixed; /* Esto evita que se mueva al hacer scroll */
-  top: 18px;
-  left: 15px;
-  z-index: 9999; /* Lo pone por encima del header, las secciones y cualquier texto */
+  position: fixed;
+  bottom: 25px; /* Lo bajamos a la parte inferior de la pantalla */
+  left: 20px;   /* Esquina inferior izquierda */
+  z-index: 9999; /* Siempre por encima de cualquier mapa, texto o formulario */
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 52px;  /* Un poquito más grande para que sea fácil de tocar */
+  height: 52px;
   margin: 0;
   padding: 0;
   background: var(--superficie);
   border: 1px solid var(--borde);
   border-radius: 50%;
   color: var(--texto);
-  box-shadow: 0 4px 12px rgba(27, 36, 44, 0.15); /* Sombra para resaltar sobre el fondo */
+  
+  /* Sombra más fuerte para asegurar que resalte y parezca flotar sobre el contenido */
+  box-shadow: 0 4px 16px rgba(27, 36, 44, 0.25); 
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -523,13 +526,13 @@ input[type=checkbox]:checked::after {
   background: var(--oxford-metalico);
   color: var(--sobre);
   border-color: transparent;
-  transform: translateY(-2px); /* Pequeño realce sin romper la posición fija */
-  box-shadow: 0 6px 15px rgba(28, 40, 51, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(28, 40, 51, 0.4);
 }
 
 .btn-regresar svg {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   stroke: currentColor;
   stroke-width: 2.5;
   stroke-linecap: round;
@@ -537,9 +540,7 @@ input[type=checkbox]:checked::after {
   fill: none;
 }
 
-/* ========================================================
-   MAGIA CSS: Oculta el botón en el menú principal
-   ======================================================== */
+/* Magia CSS: Lo oculta automáticamente SOLO en el menú principal */
 body:has(#inicio.activa) .btn-regresar {
   display: none !important;
 }
